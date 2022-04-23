@@ -1,28 +1,34 @@
-import Head from "next/head"
-import { Component } from 'react'
-import { attributes, react as HomeContent } from '../content/home.md';
+import matter from 'gray-matter';
+import { GetStaticProps, NextPage } from 'next';
 
-export default class Home extends Component {
-  render() {
-    let { title, cats } = attributes;
-    return (
-      <>
-        <Head>
-          <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-        </Head>
-        <article>
-          <h1>{title}</h1>
-          <HomeContent />
-          <ul>
-            {cats.map((cat, k) => (
-              <li key={k}>
-                <h2>{cat.name}</h2>
-                <p>{cat.description}</p>
-              </li>
-            ))}
-          </ul>
-        </article>
-      </>
-    )
+type Props = {
+  content: string,
+  data: {
+  title: string,
+  cats: Array<{
+    name: string,
+    description: string
+  }>
+}
+}
+
+const Page: NextPage<Props> = ({ content, data }) => (
+  <ul>
+    {data.cats.map((cat) => (
+      <li key={cat.name}>{cat.name}</li>
+    ))}
+  </ul>
+)
+
+export const getStaticProps: GetStaticProps = async (context) => {
+  const page = matter.read('./content/home.md')
+  console.log(page);
+  return {
+    props: {
+      content: page.content,
+      data: page.data
+    },
   }
 }
+
+export default Page
